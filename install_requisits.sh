@@ -31,7 +31,9 @@ source activate tensorflow
 # CPU Only
 pip install --ignore-installed --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.3.0-cp27-none-linux_x86_64.whl
 
+#Install docker
+sudo apt -y install docker
+docker run -it gcr.io/tensorflow/tensorflow bash
 
-
-
-
+#Test Tensorflow without GPU
+python test_tensorflow.py
