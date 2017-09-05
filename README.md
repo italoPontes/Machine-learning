@@ -2,7 +2,7 @@
 
 The project generated in Machine Learning discipline.
 
-To configure you machine check Installation section.
+To configure your machine check Installation section.
 
 ## Installation
 
