@@ -14,3 +14,4 @@ Please, check `install_requisits.sh` file.
 You need to authorize the installation sometimes typing `yes` in the terminal and using `sudo` permission.
 
 If everything was correctly installed, in the end, will appear `Hello, TensorFlow!` message in the display.
+

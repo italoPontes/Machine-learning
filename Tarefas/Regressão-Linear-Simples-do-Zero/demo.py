@@ -1,6 +1,5 @@
-"""This project will calculate linear regression
-"""
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #Federal University of Campina Grande (UFCG)
 #Author: Ítalo de Pontes Oliveira
 #Adapted from: Siraj Raval
@@ -9,9 +8,12 @@
 #The optimal values of m and b can be actually calculated with way less effort than doing a linear regression. 
 #this is just to demonstrate gradient descent
 
+"""This project will calculate linear regression
+"""
+import matplotlib.pyplot as plt
+
 from numpy import *
 import sys
-
 
 ## This method prints the correct way to call this application in terminal
 #  @param argv Is the parameter list passed
@@ -50,27 +52,42 @@ def step_gradient(b_current, m_current, points, learningRate):
 def gradient_descent_runner(points, starting_b, starting_m, learning_rate, num_iterations):
 	b = starting_b
 	m = starting_m
-	for i in range(num_iterations):
+	previous_rss = 0
+	rss_by_step = 0
+	diff = learning_rate 
+	
+	#for i in range(num_iterations):
+	while diff > (learning_rate/10):
 		b, m = step_gradient(b, m, array(points), learning_rate)
+		previous_rss = rss_by_step
+		rss_by_step = compute_error_for_line_given_points(b, m, points)
+		diff = fabs(rss_by_step - previous_rss)
+		print diff
+		
 	return [b, m]
 
 def run(input_filename):
 	points = genfromtxt(input_filename, delimiter=",")
-	learning_rate = 0.0001
+	learning_rate = 0.001
 	initial_b = 0 # initial y-intercept guess
 	initial_m = 0 # initial slope guess
-	num_iterations = 1000
+	#num_iterations = 1000
 	print "Starting gradient descent at b = {0}, m = {1}, error = {2}".format(initial_b, initial_m, compute_error_for_line_given_points(initial_b, initial_m, points))
 	print "Running..."
 	[b, m] = gradient_descent_runner(points, initial_b, initial_m, learning_rate, num_iterations)
 	print "After {0} iterations b = {1}, m = {2}, error = {3}".format(num_iterations, b, m, compute_error_for_line_given_points(b, m, points))
 
 
-
+## Main function
 if __name__ == '__main__':
-	if len(sys.argv) != 3:
+	if len(sys.argv) != 2:
 		printErrorLog(sys.argv)
 		exit(0)
+	
+	plt.plot([1,2,3,4])
+	plt.ylabel('some numbers')
+	plt.show()
+	
 	
 	input_filename = sys.argv[1]
 	run(input_filename)
