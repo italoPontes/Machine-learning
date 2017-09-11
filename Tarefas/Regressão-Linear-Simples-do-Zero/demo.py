@@ -20,8 +20,10 @@ import sys
 #  @param argv Is the parameter list passed
 def printErrorLog(argv):
 	message = "\n\n\n"
-	message += "You must call:\n"
-	message += "python " + sys.argv[0] + " <input_file_name> <output_figure_name> <learning_rate> <num_iteractions>"
+	message += "This application works one of the ways:\n\n"
+	message += "python " + sys.argv[0] + " <input_file_name>\n"
+	message += "python " + sys.argv[0] + " <input_file_name> <output_figure_name> <learning_rate>\n"
+	message += "python " + sys.argv[0] + " <input_file_name> <output_figure_name> <learning_rate> <num_iteractions>\n\n"
 	message += "in which:\n"
 	message += "<input_file_name>: Is the file name that contains the 'x' and 'y' values separated by the comma to be trained.\n"
 	message += "<output_figure_name>: Figure name to save iteraction x RSS graphic.\n"
@@ -112,6 +114,17 @@ def gradient_descent_runner(points, starting_b, starting_m, learning_rate, num_i
 	
 	return [b, m, i]
 
+## Compute the W0 and W1 by derivative
+#  @param points Domain and image points
+def compute_normal_equation(points):
+	x = points[:,0] 
+	y = points[:,1]
+	x_mean = numpy.mean(x)
+	y_mean = numpy.mean(y)
+	w1 = sum((x - x_mean)*(y - numpy.mean(y)))/sum((x - x_mean)**2)
+	w0 = y_mean-(w1*x_mean)
+	return [w0, w1]
+
 ## Compute the line approximation for all data passed
 #  @param input_filename File that contains the domain and image points
 #  @param output_filename Figure name to save iteraction x RSS graphic
@@ -122,9 +135,12 @@ def run(input_filename, output_filename, learning_rate, num_iterations):
 	initial_b = 0 # initial y-intercept guess
 	initial_m = 0 # initial slope guess
 	
-	print "Starting gradient descent at b = {0}, m = {1}, error = {2}".format(initial_b, initial_m, compute_error_for_line_given_points(initial_b, initial_m, points))
-	print "Running..."
-	[b, m, num_iterations] = gradient_descent_runner(points, initial_b, initial_m, learning_rate, num_iterations, output_filename)
+	if learning_rate == 0: 
+		[b, m] = compute_normal_equation(points)
+	else:
+		print "Starting gradient descent at b = {0}, m = {1}, error = {2}".format(initial_b, initial_m, compute_error_for_line_given_points(initial_b, initial_m, points))
+		[b, m, num_iterations] = gradient_descent_runner(points, initial_b, initial_m, learning_rate, num_iterations, output_filename)
+	
 	print "After {0} iterations b = {1}, m = {2}, error = {3}".format(num_iterations, b, m, compute_error_for_line_given_points(b, m, points))
 
 ## Main function
@@ -133,16 +149,19 @@ def run(input_filename, output_filename, learning_rate, num_iterations):
 #  @param sys.argv[3] The rate in which the gradient will be changed in one step
 #  @param sys.argv[4] Interactions number that the slope line will approximate before a stop
 if __name__ == '__main__':
-	if (len(sys.argv) != 4) and (len(sys.argv) != 5):
+	if (len(sys.argv) != 2) and len(sys.argv) != 4) and (len(sys.argv) != 5):
 		printErrorLog(sys.argv)
 		exit(0)
 	
 	input_filename = sys.argv[1]
-	output_filename = sys.argv[2]
-	learning_rate = float(sys.argv[3])
+	learning_rate = 0
 	num_iteractions = 0
 	
-	if len(sys.argv) == 5:
+	if (len(sys.argv) == 2):
+		output_filename = sys.argv[2]
+	elif (len(sys.argv) == 4) or (len(sys.argv) == 5):
+		learning_rate = float(sys.argv[3])
+	elif len(sys.argv) == 5:
 		num_iteractions = int(sys.argv[4])
 	
 	run(input_filename, output_filename, learning_rate, num_iteractions)
