@@ -12,6 +12,7 @@
 """
 import matplotlib.pyplot as plt
 
+import numpy
 from numpy import *
 import sys
 
@@ -20,7 +21,7 @@ import sys
 def printErrorLog(argv):
 	message = "\n\n\n"
 	message += "You must call:\n"
-	message += "python " + sys.argv[0] + " <input_file_name> <output_figure_name> <learning_rate> <num_iteractions>\n"
+	message += "python " + sys.argv[0] + " <input_file_name> <output_figure_name> <learning_rate> <num_iteractions>"
 	message += "in which:\n"
 	message += "<input_file_name>: Is the file name that contains the 'x' and 'y' values separated by the comma to be trained.\n"
 	message += "<output_figure_name>: Figure name to save iteraction x RSS graphic.\n"
@@ -28,6 +29,20 @@ def printErrorLog(argv):
 	message += "<num_iteractions>: Interactions number that the slope line will approximate before a stop.\n"
 	message += "\n\n\n"
 	print message
+
+## Save figure in disk
+#  @param data Data to show in the graphic.
+#  @param xlabel Text to be shown in abscissa axis.
+#  @param ylabel Text to be shown in ordinate axis.
+#  @param filename Graphic name
+def save_figure(data, xlabel, ylabel, filename):
+	plt.plot(data)
+	plt.xlabel(xlabel)
+	plt.ylabel(ylabel)
+	plt.savefig(filename)
+	plt.cla() # clears an axis
+	plt.clf() # clears the entire current figure 
+	plt.close() # closes a window
 
 # y = mx + b
 # m is slope, b is y-intercept
@@ -51,6 +66,7 @@ def compute_error_for_line_given_points(b, m, points):
 def step_gradient(b_current, m_current, points, learningRate):
 	b_gradient = 0
 	m_gradient = 0
+	norma = 0
 	N = float(len(points))
 	for i in range(0, len(points)):
 		x = points[i, 0]
@@ -59,21 +75,12 @@ def step_gradient(b_current, m_current, points, learningRate):
 		m_gradient += -(2/N) * x * (y - ((m_current * x) + b_current))
 	new_b = b_current - (learningRate * b_gradient)
 	new_m = m_current - (learningRate * m_gradient)
-	return [new_b, new_m]
-
-## Save figure in disk
-#  @param data Data to show in the graphic.
-#  @param xlabel Text to be shown in abscissa axis.
-#  @param ylabel Text to be shown in ordinate axis.
-#  @param filename Graphic name
-def save_figure(data, xlabel, ylabel, filename):
-	plt.plot(data)
-	plt.xlabel(xlabel)
-	plt.ylabel(ylabel)
-	plt.savefig(filename)
-	plt.cla() # clears an axis
-	plt.clf() # clears the entire current figure 
-	plt.close() # closes a window,
+	
+	point_a = numpy.array([m_current, b_current])
+	point_b = numpy.array([new_m, new_b])
+	norma = numpy.linalg.norm(point_a - point_b)
+	
+	return [new_b, new_m, norma]
 
 ## Run the descending gradient
 #  @param points Domain and image points
@@ -85,23 +92,19 @@ def save_figure(data, xlabel, ylabel, filename):
 def gradient_descent_runner(points, starting_b, starting_m, learning_rate, num_iterations, output_filename):
 	b = starting_b
 	m = starting_m
-	previous_rss = 0
 	rss_by_step = 0
-	i = 0
-	diff = learning_rate 
 	rss_total = []
+	norma = learning_rate
+	i = 0
 	
 	condiction = True
 	if num_iteractions < 1:
 		condiction = False
 	
-	while (diff > (learning_rate/1000) and not condiction) or ( i < num_iteractions and condiction):
-		b, m = step_gradient(b, m, array(points), learning_rate)
+	while (norma > (learning_rate/1000) and not condiction) or ( i < num_iteractions and condiction):
+		b, m, norma = step_gradient(b, m, array(points), learning_rate)
 		
-		previous_rss = rss_by_step
 		rss_by_step = compute_error_for_line_given_points(b, m, points)
-		diff = fabs(rss_by_step - previous_rss)
-		
 		rss_total.append(rss_by_step)
 		i += 1
 
