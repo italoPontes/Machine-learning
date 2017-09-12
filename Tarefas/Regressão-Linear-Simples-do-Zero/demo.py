@@ -119,7 +119,7 @@ def gradient_descent_runner(x, y, starting_w0, starting_w1, learning_rate, num_i
 def compute_normal_equation(x, y):
 	x_mean = numpy.mean(x)
 	y_mean = numpy.mean(y)
-	w1 = sum((x - x_mean)*(y - numpy.mean(y)))/sum((x - x_mean)**2)
+	w1 = sum((x - x_mean)*(y - y_mean))/sum((x - x_mean)**2)
 	w0 = y_mean-(w1*x_mean)
 	return [w0, w1]
 
