@@ -51,49 +51,48 @@ def save_figure(data, xlabel, ylabel, filename):
 ## Compute the errors for a given line
 #  @param b Is the linear coefficient
 #  @param m Is the angular coefficient
-#  @param point All points from domain and image
-def compute_error_for_line_given_points(b, m, points):
-	totalError = 0
-	for i in range(0, len(points)):
-		x = points[i, 0]
-		y = points[i, 1]
-		totalError += (y - (m * x + b)) ** 2
-	return totalError / float(len(points))
+#  @param x Domain points
+#  @param y Domain points
+def compute_error_for_line_given_points(w0, w1, x, y):
+	totalError = sum((y - (w1 * x + w0)) ** 2)
+	totalError /= float(len(x))
+	return totalError
 
 ## Calculate a new linear and angular coefficient step by a learning rate. 
-#  @param b_current Current linear coefficient
-#  @param m_current Current linear coefficient
-#  @param points All points from domain and image
+#  @param w0_current Current linear coefficient
+#  @param w1_current Current linear coefficient
+#  @param x Domain points
+#  @param y Image points
 #  @param learningRate The rate in which the gradient will be changed in one step
-def step_gradient(b_current, m_current, points, learningRate):
-	b_gradient = 0
-	m_gradient = 0
+def step_gradient(w0_current, w1_current, x, y, learningRate):
+	w0 = 0
+	w1 = 0
 	norma = 0
-	N = float(len(points))
-	for i in range(0, len(points)):
-		x = points[i, 0]
-		y = points[i, 1]
-		b_gradient += -(2/N) * (y - ((m_current * x) + b_current))
-		m_gradient += -(2/N) * x * (y - ((m_current * x) + b_current))
-	new_b = b_current - (learningRate * b_gradient)
-	new_m = m_current - (learningRate * m_gradient)
+	N = float(len(x))
 	
-	point_a = numpy.array([m_current, b_current])
-	point_b = numpy.array([new_m, new_b])
+	w0 = -2 * sum( y - ( w0_current + ( w1_current * x ) ) ) / N
+	w1 = -2 * sum( ( y - ( w0_current + ( w1_current * x ) ) ) * x ) / N
+	
+	new_w0 = w0_current - (learningRate * w0)
+	new_w1 = w1_current - (learningRate * w1)
+	
+	point_a = numpy.array([w0_current, w1_current])
+	point_b = numpy.array([new_w0, new_w1])
 	norma = numpy.linalg.norm(point_a - point_b)
 	
-	return [new_b, new_m, norma]
+	return [new_w0, new_w1, norma]
 
 ## Run the descending gradient
-#  @param points Domain and image points
-#  @param starting_b Linear coefficient initial
-#  @param starting_m Angular coefficient initial
+#  @param x Domain points
+#  @param y Image points
+#  @param starting_w0 Linear coefficient initial
+#  @param starting_w1 Angular coefficient initial
 #  @param learning_rate The rate in which the gradient will be changed in one step
 #  @param num_iterations Interactions number that the slope line will approximate before a stop.
 #  @param output_filename Figure name to save iteraction x RSS graphic
-def gradient_descent_runner(points, starting_b, starting_m, learning_rate, num_iterations, output_filename):
-	b = starting_b
-	m = starting_m
+def gradient_descent_runner(x, y, starting_w0, starting_w1, learning_rate, num_iterations, output_filename):
+	w0 = starting_w0
+	w1 = starting_w1
 	rss_by_step = 0
 	rss_total = []
 	norma = learning_rate
@@ -104,21 +103,20 @@ def gradient_descent_runner(points, starting_b, starting_m, learning_rate, num_i
 		condiction = False
 	
 	while (norma > (learning_rate/1000) and not condiction) or ( i < num_iteractions and condiction):
-		b, m, norma = step_gradient(b, m, array(points), learning_rate)
+		w0, w1, norma = step_gradient(w0, w1, x, y, learning_rate)
 		
-		rss_by_step = compute_error_for_line_given_points(b, m, points)
+		rss_by_step = compute_error_for_line_given_points(w0, w1, x, y)
 		rss_total.append(rss_by_step)
 		i += 1
 
 	save_figure(rss_total, "Iteraction", "RSS", output_filename)	
 	
-	return [b, m, i]
+	return [w0, w1, i]
 
 ## Compute the W0 and W1 by derivative
-#  @param points Domain and image points
-def compute_normal_equation(points):
-	x = points[:,0] 
-	y = points[:,1]
+#  @param x Domain points
+#  @param y Image points
+def compute_normal_equation(x, y):
 	x_mean = numpy.mean(x)
 	y_mean = numpy.mean(y)
 	w1 = sum((x - x_mean)*(y - numpy.mean(y)))/sum((x - x_mean)**2)
@@ -132,16 +130,18 @@ def compute_normal_equation(points):
 #  @param num_iteractions Interactions number that the slope line will approximate before a stop
 def run(input_filename, output_filename, learning_rate, num_iterations):
 	points = genfromtxt(input_filename, delimiter=",")
-	initial_b = 0 # initial y-intercept guess
-	initial_m = 0 # initial slope guess
+	initial_w0 = 0 # initial y-intercept guess
+	initial_w1 = 0 # initial slope guess
+	x = points[:,0] 
+	y = points[:,1]
 	
 	if learning_rate == 0: 
-		[b, m] = compute_normal_equation(points)
+		[w0, w1] = compute_normal_equation(x, y)
 	else:
-		print "Starting gradient descent at b = {0}, m = {1}, error = {2}".format(initial_b, initial_m, compute_error_for_line_given_points(initial_b, initial_m, points))
-		[b, m, num_iterations] = gradient_descent_runner(points, initial_b, initial_m, learning_rate, num_iterations, output_filename)
+		print "Starting gradient descent at b = {0}, m = {1}, error = {2}".format(initial_w0, initial_w1, compute_error_for_line_given_points(initial_w0, initial_w1, x, y))
+		[w0, w1, num_iterations] = gradient_descent_runner(x, y, initial_w0, initial_w1, learning_rate, num_iterations, output_filename)
 	
-	print "After {0} iterations b = {1}, m = {2}, error = {3}".format(num_iterations, b, m, compute_error_for_line_given_points(b, m, points))
+	print "After {0} iterations b = {1}, m = {2}, error = {3}".format(num_iterations, w0, w1, compute_error_for_line_given_points(w0, w1, x, y))
 
 ## Main function
 #  @param sys.argv[1] Is the file name that contains the 'x' and 'y' values separated by the comma to be trained
@@ -149,19 +149,22 @@ def run(input_filename, output_filename, learning_rate, num_iterations):
 #  @param sys.argv[3] The rate in which the gradient will be changed in one step
 #  @param sys.argv[4] Interactions number that the slope line will approximate before a stop
 if __name__ == '__main__':
-	if (len(sys.argv) != 2) and len(sys.argv) != 4) and (len(sys.argv) != 5):
+	if (len(sys.argv) != 2) and len(sys.argv) != 4 and (len(sys.argv) != 5):
 		printErrorLog(sys.argv)
 		exit(0)
 	
+	output_filename = ""
 	input_filename = sys.argv[1]
 	learning_rate = 0
 	num_iteractions = 0
 	
-	if (len(sys.argv) == 2):
+	if len(sys.argv) == 5:
 		output_filename = sys.argv[2]
-	elif (len(sys.argv) == 4) or (len(sys.argv) == 5):
 		learning_rate = float(sys.argv[3])
-	elif len(sys.argv) == 5:
 		num_iteractions = int(sys.argv[4])
+	elif (len(sys.argv) == 4):
+		output_filename = sys.argv[2]
+		learning_rate = float(sys.argv[3])
+	
 	
 	run(input_filename, output_filename, learning_rate, num_iteractions)
