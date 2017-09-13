@@ -65,20 +65,18 @@ def compute_error_for_line_given_points(w0, w1, x, y):
 #  @param y Image points
 #  @param learningRate The rate in which the gradient will be changed in one step
 def step_gradient(w0_current, w1_current, x, y, learningRate):
-	w0 = 0
-	w1 = 0
+	w0_gradient = 0
+	w1_gradient = 0
 	norma = 0
 	N = float(len(x))
 	
-	w0 = -2 * sum( y - ( w0_current + ( w1_current * x ) ) ) / N
-	w1 = -2 * sum( ( y - ( w0_current + ( w1_current * x ) ) ) * x ) / N
+	w0_gradient = -2 * sum( y - ( w0_current + ( w1_current * x ) ) ) / N
+	w1_gradient = -2 * sum( ( y - ( w0_current + ( w1_current * x ) ) ) * x ) / N
+
+	norma = numpy.linalg.norm(w0_gradient - w1_gradient)
 	
-	new_w0 = w0_current - (learningRate * w0)
-	new_w1 = w1_current - (learningRate * w1)
-	
-	point_a = numpy.array([w0_current, w1_current])
-	point_b = numpy.array([new_w0, new_w1])
-	norma = numpy.linalg.norm(point_a - point_b)
+	new_w0 = w0_current - (learningRate * w0_gradient)
+	new_w1 = w1_current - (learningRate * w1_gradient)
 	
 	return [new_w0, new_w1, norma]
 
@@ -96,22 +94,22 @@ def gradient_descent_runner(x, y, starting_w0, starting_w1, learning_rate, num_i
 	rss_by_step = 0
 	rss_total = []
 	norma = learning_rate
-	i = 0
+	iteration_number = 0
 	
 	condiction = True
 	if num_iteractions < 1:
 		condiction = False
 	
-	while (norma > (learning_rate/1000) and not condiction) or ( i < num_iteractions and condiction):
+	while (norma > (learning_rate/1000) and not condiction) or ( iteration_number < num_iteractions and condiction):
 		w0, w1, norma = step_gradient(w0, w1, x, y, learning_rate)
 		
 		rss_by_step = compute_error_for_line_given_points(w0, w1, x, y)
 		rss_total.append(rss_by_step)
-		i += 1
+		iteration_number += 1
 
 	save_figure(rss_total, "Iteraction", "RSS", output_filename)	
 	
-	return [w0, w1, i]
+	return [w0, w1, iteration_number]
 
 ## Compute the W0 and W1 by derivative
 #  @param x Domain points
