@@ -134,11 +134,11 @@ def run(input_filename, output_filename, learning_rate, num_iterations):
 	if learning_rate == 0: 
 		[w0, w1] = compute_normal_equation(x, y)
 	else:
-		print "Starting gradient descent at b = {0}, m = {1}, error = {2}".format(initial_w0, initial_w1, compute_error_for_line_given_points(initial_w0, initial_w1, x, y))
+		print "Starting gradient descent at w0 = {0}, w1 = {1}, error = {2}".format(initial_w0, initial_w1, compute_error_for_line_given_points(initial_w0, initial_w1, x, y))
 		[w0, w1, num_iterations, rss_total] = gradient_descent_runner(x, y, initial_w0, initial_w1, learning_rate, num_iterations, output_filename)
 		save_figure(rss_total, "Iteration", "RSS", output_filename)
 		
-	print "After {0} iterations b = {1}, m = {2}, error = {3}".format(num_iterations, w0, w1, compute_error_for_line_given_points(w0, w1, x, y))
+	print "After {0} iterations w0 = {1}, w1 = {2}, error = {3}".format(num_iterations, w0, w1, compute_error_for_line_given_points(w0, w1, x, y))
 
 
 ## Main function
