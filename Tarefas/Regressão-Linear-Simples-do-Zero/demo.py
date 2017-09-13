@@ -87,7 +87,7 @@ def step_gradient(w0_current, w1_current, x, y, learningRate):
 #  @param starting_w1 Angular coefficient initial
 #  @param learning_rate The rate in which the gradient will be changed in one step
 #  @param num_iterations Interactions number that the slope line will approximate before a stop.
-#  @param output_filename Figure name to save iteraction x RSS graphic
+#  @param output_filename Figure name to save iteration x RSS graphic
 def gradient_descent_runner(x, y, starting_w0, starting_w1, learning_rate, num_iterations, output_filename):
 	w0 = starting_w0
 	w1 = starting_w1
@@ -97,17 +97,17 @@ def gradient_descent_runner(x, y, starting_w0, starting_w1, learning_rate, num_i
 	iteration_number = 0
 	
 	condiction = True
-	if num_iteractions < 1:
+	if num_iterations < 1:
 		condiction = False
 	
-	while (norma > 0.001 and not condiction) or ( iteration_number < num_iteractions and condiction):
+	while (norma > 0.001 and not condiction) or ( iteration_number < num_iterations and condiction):
 		w0, w1, norma = step_gradient(w0, w1, x, y, learning_rate)
 		
 		rss_by_step = compute_error_for_line_given_points(w0, w1, x, y)
 		rss_total.append(rss_by_step)
 		iteration_number += 1
 
-	save_figure(rss_total, "Iteraction", "RSS", output_filename)	
+	save_figure(rss_total, "Iteration", "RSS", output_filename)	
 	
 	return [w0, w1, iteration_number]
 
