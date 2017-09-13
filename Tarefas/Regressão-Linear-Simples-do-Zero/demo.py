@@ -100,7 +100,7 @@ def gradient_descent_runner(x, y, starting_w0, starting_w1, learning_rate, num_i
 	if num_iteractions < 1:
 		condiction = False
 	
-	while (norma > (learning_rate/1000) and not condiction) or ( iteration_number < num_iteractions and condiction):
+	while (norma > 0.001 and not condiction) or ( iteration_number < num_iteractions and condiction):
 		w0, w1, norma = step_gradient(w0, w1, x, y, learning_rate)
 		
 		rss_by_step = compute_error_for_line_given_points(w0, w1, x, y)
