@@ -16,4 +16,4 @@ Or, run in terminal:
 
 ## Task
 
-The task was answered in Google Drive, to access in Portuguese, check this [link](https://docs.google.com/document/d/1n512HYgRHvneb5kaVs-McfZeAqF1jBBRKGSDOECZLt0/edit?usp=sharing).
+The task was answered in Google Drive, to access in Portuguese, check this [link](https://github.com/italoPontes/Machine-learning/blob/master/Tarefas/Regress%C3%A3o-Linear-Simples-do-Zero/Task%2001.ipynb).
