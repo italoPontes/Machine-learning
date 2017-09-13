@@ -107,9 +107,7 @@ def gradient_descent_runner(x, y, starting_w0, starting_w1, learning_rate, num_i
 		rss_total.append(rss_by_step)
 		iteration_number += 1
 
-	save_figure(rss_total, "Iteration", "RSS", output_filename)	
-	
-	return [w0, w1, iteration_number]
+	return [w0, w1, iteration_number, rss_total]
 
 ## Compute the W0 and W1 by derivative
 #  @param x Domain points
@@ -137,9 +135,11 @@ def run(input_filename, output_filename, learning_rate, num_iterations):
 		[w0, w1] = compute_normal_equation(x, y)
 	else:
 		print "Starting gradient descent at b = {0}, m = {1}, error = {2}".format(initial_w0, initial_w1, compute_error_for_line_given_points(initial_w0, initial_w1, x, y))
-		[w0, w1, num_iterations] = gradient_descent_runner(x, y, initial_w0, initial_w1, learning_rate, num_iterations, output_filename)
-	
+		[w0, w1, num_iterations, rss_total] = gradient_descent_runner(x, y, initial_w0, initial_w1, learning_rate, num_iterations, output_filename)
+		save_figure(rss_total, "Iteration", "RSS", output_filename)
+		
 	print "After {0} iterations b = {1}, m = {2}, error = {3}".format(num_iterations, w0, w1, compute_error_for_line_given_points(w0, w1, x, y))
+
 
 ## Main function
 #  @param sys.argv[1] Is the file name that contains the 'x' and 'y' values separated by the comma to be trained
