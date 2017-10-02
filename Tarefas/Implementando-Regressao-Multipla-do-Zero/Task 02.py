@@ -2,11 +2,6 @@
 # -*- coding: utf-8 -*-
 #Federal University of Campina Grande (UFCG)
 #Author: Ítalo de Pontes Oliveira
-#Adapted from: Siraj Raval
-#Available at: https://github.com/llSourcell/linear_regression_live
-
-"""This project will calculate Multiple Linear Regression
-"""
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
