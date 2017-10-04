@@ -46,49 +46,51 @@ def normalize(mat):
 	mat_normalized = ( mat - min_values ) / diff
 	return [mat_normalized, max_values, min_values]
 
-def compute_RSS(H, w, y, lamdba):
+def compute_cost(H, w, y, lmbda):
 	mat = y - np.dot(H, w)
-	mult = np.dot(w, w)
-	rss = np.sum( np.transpose( mat ) * mat ) + (lamdba * mult) # To do a correct way to compute this error
-	return rss
+	rss = np.sum( np.transpose( mat ) * mat )
+	cost = rss + ( lmbda * np.dot( np.transpose(w), w ) )
+	return cost
 
 def compute_norma(vector):
 	norma = np.sqrt( np.sum( vector ** 2 ) )
 	return norma
 
-def step_gradient(H, w_current, y, learning_rate, lamdba):
+def step_gradient(H, w_current, y, learning_rate, lmbda):
 	w = 0.0
 	norma = 0.0
 	N = float(len(H))
 	
-	#partial = np.sum( np.transpose(H) * ( y - np.dot(H, w_current) ), axis = 1 )
-	partial = np.sum( np.transpose(H) * ( y - np.dot(H, w_current) ), axis = 1 ) # To do implementation of RIDGE gradient
+	partial = np.dot( np.transpose(H), ( y - np.dot( H, w_current ) ) )
+	
+	w = ( ( 1 - ( 2 * learning_rate * lmbda ) ) * w_current ) + ( 2 * learning_rate * partial )
 	
 	norma = compute_norma(partial)
 	
-	w = w_current + ( 2 * learning_rate * partial )
-	
-	return [w, norma]
+	return [w, norma, partial]
 
-def gradient_descent(H, y, learning_rate, epsilon, lamdba):
+def gradient_descent(H, y, learning_rate, epsilon, lmbda):
 	w = np.zeros((H.shape[1])) #has the same size of output
-	rss_total = []
-	rss_by_step = 0
+	cost_total = []
+	cost_by_step = 0
 	norma_total = []
 	norma = epsilon + 1
 	num_iterations = 0
 	
 	while(norma > epsilon):
-		[w, norma] = step_gradient(H, w, y, learning_rate, lamdba)
-		'''
+		[w, norma, partial] = step_gradient(H, w, y, learning_rate, lmbda)
 		num_iterations += 1
-		if num_iterations % 10 == 0:
-			rss_by_step = compute_RSS(H, w, y)
-			rss_total.append(rss_by_step)
-		'''
+		if num_iterations % 10000 == 0:
+			cost_by_step = compute_cost(H, w, y, lmbda)
+			cost_total.append(cost_by_step)
+			print("Num iteractions: {0}".format(num_iterations))
+			print("Norma: {0}".format(norma))
+			print("Coef: {0}".format(w))
+			print("Partial: {0}".format(partial))
+			print("Cost: {0}\n\n".format(cost_by_step))
 		norma_total.append(norma)
 	
-	return [w, num_iterations, rss_total, norma_total]
+	return [w, num_iterations, cost_total, norma_total]
  
  
 
@@ -102,7 +104,7 @@ if __name__ == '__main__':
 	input_filename = sys.argv[1]
 	learning_rate = float(sys.argv[2])
 	epsilon = float(sys.argv[3])
-	lamdba = float(sys.argv[4])
+	lmbda = float(sys.argv[4])
 	prefix_filename = sys.argv[5]
 	
 	att = genfromtxt(input_filename, delimiter=",", skip_header=1)
@@ -110,7 +112,7 @@ if __name__ == '__main__':
 	y = att[:,-1] # Get column of predict variable
 	H_with_ones = np.c_[np.ones(len(H)), H]
 	
-	[w, num_iterations, rss_total, norma_total] = gradient_descent(H_with_ones, y, learning_rate, epsilon, lamdba)
+	[w, num_iterations, cost_total, norma_total] = gradient_descent(H_with_ones, y, learning_rate, epsilon, lmbda)
 	
-	print("\n\nNum iterations: {0}\nRSS: {1}\nW: {2}".format(num_iterations, rss_total[-1], w))
+	print("\n\nNum iterations: {0}\nCost: {1}\nW: {2}\nNorma: {3}".format(num_iterations, cost_total[-1], w, norma_total[-1]))
 	
