@@ -80,7 +80,7 @@ def gradient_descent(H, y, learning_rate, epsilon, lmbda):
 	while(norma > epsilon):
 		[w, norma, partial] = step_gradient(H, w, y, learning_rate, lmbda)
 		num_iterations += 1
-		if num_iterations % 10000 == 0:
+		if num_iterations % 100 == 0:
 			cost_by_step = compute_cost(H, w, y, lmbda)
 			cost_total.append(cost_by_step)
 			print("Num iteractions: {0}".format(num_iterations))
