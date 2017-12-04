@@ -13,11 +13,11 @@ sudo apt -y update
 
 #Install Numpy and other dependencies
 #source: https://www.scipy.org/install.html
-sudo apt -y install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
+sudo apt -y install python3-numpy python3-scipy python3-matplotlib ipython3 ipython3-notebook python3-pandas python3-sympy python3-nose
 
 #Install Scikit-learn
 #source: http://scikit-learn.org/stable/install.html
-sudo apt -y install python-pip
+sudo apt -y install python3-pip
 sudo pip install -U scikit-learn
 
 #Install Anaconda 4.4.0

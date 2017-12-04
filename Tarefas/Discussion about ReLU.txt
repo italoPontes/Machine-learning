@@ -1,0 +1,17 @@
+Nesse vídeo (https://www.youtube.com/watch?v=-7scQpJT7uo) do Siraj Raval, é discutido o seguinte:
+
+O uso da Sigmóide têm as seguintes características:
+
+A sigmóide pode saturar e "matar" o gradiente.
+A sigmóide possui uma convergência lenta devido a sua derivada ser muito baixa nos pontos "extremos".
+A sigmóide não é centralizada em zero (não entendo bem como isso pode ser um problema).
+Por fim, não tem problema em usar a sigmóide na camada de saída.
+
+
+Uma alternativa para melhorar o desempenho da rede, é usar a camada Tanh em vez de Sigmóide, porque seu gradiente é mais acentuado e é centralizado em zero.
+
+
+Já a camada ReLU, é melhor que as camadas anteriores para uso nas camadas escondidas (menos na camada de saída, sendo mais indicado o uso da SoftMax para problemas de classificacão e a Linear para Regressão), pois a ReLU evita o problema do gradiente desaparecer e por ser uma operacão matemática simples, se torna menos custoso computacionalmente.
+
+
+Existe uma variacão do Relu, que é o Leaky-ReLU, que em vez de zerar os valores negativos, permite que eles sejam propagados mas com baixa contribuicão para as camadas seguintes. A Leaky-ReLU, em vez de ser definida como max(0, x), poderia ser definida como: max(0.001x, x). Entretanto, essa variacão gera um pequeno problema que é o acréscimo de mais um parâmetro ao modelo.
